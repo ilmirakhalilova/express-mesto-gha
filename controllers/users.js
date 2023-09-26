@@ -7,7 +7,7 @@ const ERROR_CODE_DEFAULT = 500;
 module.exports.findAllUsers = (req, res) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch((err) => res.status(ERROR_CODE_DEFAULT).send({ message: `Произошла ошибка: ${err.message}` }));
+    .catch((err) => res.status(ERROR_CODE_DEFAULT).send({ message: `На сервере произошла ошибка: ${err.message}` }));
 };
 
 module.exports.findUserById = (req, res) => {
@@ -24,7 +24,7 @@ module.exports.findUserById = (req, res) => {
         res.status(ERROR_CODE_INCORRECT_DATA).send({ message: `Произошла ошибка: ${err.message}` });
         return;
       }
-      res.status(ERROR_CODE_DEFAULT).send({ message: `Произошла ошибка: ${err.message}` });
+      res.status(ERROR_CODE_DEFAULT).send({ message: `На сервере произошла ошибка: ${err.message}` });
     });
 };
 
@@ -36,7 +36,7 @@ module.exports.createUser = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_CODE_INCORRECT_DATA).send({ message: 'Переданы некорректные данные при создании пользователя.' });
       } else {
-        res.status(ERROR_CODE_DEFAULT).send({ message: `Произошла ошибка: ${err.message}` });
+        res.status(ERROR_CODE_DEFAULT).send({ message: `На сервере произошла ошибка: ${err.message}` });
       }
     });
 };
@@ -55,7 +55,7 @@ module.exports.updateUser = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_CODE_INCORRECT_DATA).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
       } else {
-        res.status(ERROR_CODE_DEFAULT).send({ message: `Произошла ошибка: ${err.message}` });
+        res.status(ERROR_CODE_DEFAULT).send({ message: `На сервере произошла ошибка: ${err.message}` });
       }
     });
 };
@@ -74,7 +74,7 @@ module.exports.updateAvatar = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_CODE_INCORRECT_DATA).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
       } else {
-        res.status(ERROR_CODE_DEFAULT).send({ message: `Произошла ошибка: ${err.message}` });
+        res.status(ERROR_CODE_DEFAULT).send({ message: `На сервере произошла ошибка: ${err.message}` });
       }
     });
 };
