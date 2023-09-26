@@ -1,13 +1,5 @@
 const User = require('../models/user');
 
-/* class ValidationError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = 'ValidationError';
-    this.statusCode = 400;
-  }
-} */
-
 const ERROR_CODE_INCORRECT_DATA = 400;
 const ERROR_CODE_NOT_FOUND = 404;
 const ERROR_CODE_DEFAULT = 500;
@@ -27,7 +19,13 @@ module.exports.findUserById = (req, res) => {
       }
       res.send({ data: user });
     })
-    .catch((err) => res.status(ERROR_CODE_DEFAULT).send({ message: `Произошла ошибка: ${err.message}` }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(ERROR_CODE_INCORRECT_DATA).send({ message: `Произошла ошибка: ${err.message}` });
+        return;
+      }
+      res.status(ERROR_CODE_DEFAULT).send({ message: `Произошла ошибка: ${err.message}` });
+    });
 };
 
 module.exports.createUser = (req, res) => {
@@ -45,7 +43,7 @@ module.exports.createUser = (req, res) => {
 
 module.exports.updateUser = (req, res) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true })
+  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         res.status(ERROR_CODE_NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден.' });
@@ -64,7 +62,7 @@ module.exports.updateUser = (req, res) => {
 
 module.exports.updateAvatar = (req, res) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true })
+  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         res.status(ERROR_CODE_NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден.' });
