@@ -1,29 +1,59 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const { celebrate, Joi, errors } = require('celebrate');
+const { login, createUser } = require('./controllers/users');
+const auth = require('./middlewares/auth');
+const NotFoundError = require('./errors/not-found-err');
 
 const { PORT = 3000 } = process.env;
 const app = express();
+
 app.use(express.json());
+app.use(bodyParser.json());
 // подключаемся к серверу mongo
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
   useNewUrlParser: true,
 });
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '6510bcc24c4f0230a4762769', // вставьте сюда _id созданного в предыдущем пункте пользователя
-  };
-  next();
-});
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().regex(/https?:\/\/(\w{3}\.)?[1-9a-z\-.]{1,}\w\w(\/[1-90a-z.,_@%&?+=~/-]{1,}\/?)?#?/),
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+  }),
+}), createUser);
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+  }),
+}), login);
 
-app.use(bodyParser.json());
-
+app.use(auth);
 app.use('/users', require('./routes/user'));
 app.use('/cards', require('./routes/card'));
 
-app.use('/*', (req, res) => {
-  res.status(404).send({ message: 'Страница не существует.' });
+app.use(errors());
+
+app.use('/*', () => {
+  throw new NotFoundError('Страница не существует.');
+});
+
+// здесь обрабатываем все ошибки
+app.use((err, req, res, next) => {
+  // если у ошибки нет статуса, выставляем 500
+  const { status = 500, message } = err;
+
+  res.status(status).send({
+    // проверяем статус и выставляем сообщение в зависимости от него
+    message: status === 500
+      ? 'На сервере произошла ошибка.'
+      : message,
+  });
+  next(err);
 });
 
 app.listen(PORT, () => {
