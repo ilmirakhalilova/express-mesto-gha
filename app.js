@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { celebrate, Joi, errors } = require('celebrate');
+const helmet = require('helmet');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const NotFoundError = require('./errors/not-found-err');
@@ -11,9 +12,11 @@ const app = express();
 
 app.use(express.json());
 app.use(bodyParser.json());
+app.use(helmet());
 // подключаемся к серверу mongo
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
   useNewUrlParser: true,
+  autoIndex: true,
 });
 
 app.post('/signup', celebrate({
@@ -53,7 +56,7 @@ app.use((err, req, res, next) => {
       ? 'На сервере произошла ошибка.'
       : message,
   });
-  next(err);
+  next();
 });
 
 app.listen(PORT, () => {

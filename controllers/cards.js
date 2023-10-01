@@ -2,9 +2,9 @@ const Card = require('../models/card');
 const NotFoundError = require('../errors/not-found-err');
 const IncorrectDataError = require('../errors/incorrect-data-error');
 
-const ERROR_CODE_INCORRECT_DATA = 400;
-const ERROR_CODE_NOT_FOUND = 404;
-const ERROR_CODE_DEFAULT = 500;
+// const ERROR_CODE_INCORRECT_DATA = 400;
+// const ERROR_CODE_NOT_FOUND = 404;
+// const ERROR_CODE_DEFAULT = 500;
 
 module.exports.findAllCards = (req, res, next) => {
   Card.find({})

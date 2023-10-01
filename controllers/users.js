@@ -66,15 +66,19 @@ module.exports.createUser = (req, res, next) => {
       email: user.email,
     }))
     .catch((err) => {
+      console.dir(err);
+      console.log('eeeeeerrrrrroooorrrrr = ');
+      console.log(err.code);
+      console.log(typeof err.code);
       if (err.code === 11000) {
-        next(new ConflictError('Пользователь с таким email уже зарегистрирован.'));
-      } else
-        if (err.name === 'ValidationError') {
-          next(new IncorrectDataError('Переданы некорректные данные при создании пользователя.'));
-        } else {
-          next(err);
-        }
+        return next(new ConflictError('Пользователь с таким email уже зарегистрирован.'));
+      } else if (err.name === 'ValidationError') {
+        next(new IncorrectDataError('Переданы некорректные данные при создании пользователя.'));
+      } else {
+        next(err);
+      }
     });
+  // .catch(next);
 };
 
 module.exports.updateUser = (req, res, next) => {
