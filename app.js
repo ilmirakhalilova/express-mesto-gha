@@ -41,9 +41,7 @@ app.use('/cards', require('./routes/card'));
 
 app.use(errors());
 
-app.use('/*', () => {
-  throw new NotFoundError('Страница не существует.');
-});
+app.use('/*', (req, res, next) => next(new NotFoundError('Страница не существует.')));
 
 // здесь обрабатываем все ошибки
 app.use((err, req, res, next) => {

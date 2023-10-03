@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
 const IncorrectDataError = require('../errors/incorrect-data-error');
-const CodeNotFoundError = require('../errors/code-not-found-error');
+const UnauthorizedError = require('../errors/unauthorized-error');
 const ConflictError = require('../errors/conflict-error');
 
 module.exports.findAllUsers = (req, res, next) => {
@@ -106,12 +106,13 @@ module.exports.getUserInfo = (req, res, next) => {
       }
       res.send({ data: user });
     })
-    .catch((err) => {
+    /* .catch((err) => {
       if (err.name === 'CastError') {
         next(new IncorrectDataError('Переданы некорректные.'));
       }
       next(err);
-    });
+    }); */
+    .catch(next);
 };
 
 module.exports.login = (req, res, next) => {
@@ -119,17 +120,17 @@ module.exports.login = (req, res, next) => {
   return User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        throw new CodeNotFoundError('Неправильные почта или пароль.');
+        throw new UnauthorizedError('Неправильные почта или пароль.');
       }
       bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
             // хеши не совпали — отклоняем промис
-            throw new CodeNotFoundError('Неправильные почта или пароль.');
+            throw new UnauthorizedError('Неправильные почта или пароль.');
           }
           // аутентификация успешна
           const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-          res.status(200).cookie('jwt', token, { httpOnly: true }).send({ token });
+          res.status(200).cookie('jwt', token, { httpOnly: true }).send({ name: user.name });
         })
         .catch(next);
     })
