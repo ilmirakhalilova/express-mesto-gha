@@ -1,4 +1,5 @@
 const router = require('express').Router(); // импортируем модель
+const { celebrate, Joi } = require('celebrate');
 const {
   findAllUsers,
   findUserById,
@@ -7,10 +8,27 @@ const {
   getUserInfo,
 } = require('../controllers/users');
 
-router.get('/', findAllUsers);
-router.get('/:userId', findUserById);
-router.patch('/me', updateUser); // обновляет профиль
-router.patch('/me/avatar', updateAvatar); // обновляет аватар
 router.get('/me', getUserInfo); // возвращает информацию о текущем пользователе
+
+router.get('/', findAllUsers);
+
+router.get('/:userId', celebrate({
+  params: Joi.object().keys({
+    userId: Joi.string().required().hex().length(24),
+  }),
+}), findUserById);
+
+router.patch('/me', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+  }),
+}), updateUser); // обновляет профиль
+
+router.patch('/me/avatar', celebrate({
+  body: Joi.object().keys({
+    avatar: Joi.string().required().regex(/https?:\/\/(\w{3}\.)?[1-9a-z\-.]{1,}\w\w(\/[1-90a-z.,_@%&?+=~/-]{1,}\/?)?#?/),
+  }),
+}), updateAvatar); // обновляет аватар
 
 module.exports = router;

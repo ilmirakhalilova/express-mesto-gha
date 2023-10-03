@@ -88,7 +88,7 @@ module.exports.updateUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new IncorrectDataError('Переданы некорректные данные при обновлении профиля.'));
+        next(new IncorrectDataError("Переданы некорректные данные при обновлении профиля."));
       } else {
         next(err);
       }
@@ -114,10 +114,12 @@ module.exports.updateAvatar = (req, res, next) => {
 };
 
 module.exports.getUserInfo = (req, res, next) => {
+  console.log('qwerty');
+  console.log(req.user._id);
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Пользователь по указанному _id не найден.');
+        throw new NotFoundError('Пользователь по указанному _id не найден.hhhhhhh');
       }
       res.send({ data: user });
     })
