@@ -1,6 +1,7 @@
 const Card = require('../models/card');
 const NotFoundError = require('../errors/not-found-err');
 const IncorrectDataError = require('../errors/incorrect-data-error');
+const ForbiddenError = require('../errors/forbidden-error');
 
 // const ERROR_CODE_INCORRECT_DATA = 400;
 // const ERROR_CODE_NOT_FOUND = 404;
@@ -39,7 +40,7 @@ module.exports.deleteCard = (req, res, next) => {
         // return;
       }
       if (!card.owner.equals(req.user._id)) {
-        throw new NotFoundError('Доступ запрещен.');
+        throw new ForbiddenError('Доступ запрещен.');
         // res.status(ERROR_CODE_NOT_FOUND).send({ message: 'Доступ запрещен.' });
         // return;
       }

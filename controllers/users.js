@@ -88,7 +88,7 @@ module.exports.updateUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new IncorrectDataError("Переданы некорректные данные при обновлении профиля."));
+        next(new IncorrectDataError('Переданы некорректные данные при обновлении профиля.'));
       } else {
         next(err);
       }
@@ -119,7 +119,7 @@ module.exports.getUserInfo = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Пользователь по указанному _id не найден.hhhhhhh');
+        throw new NotFoundError('Пользователь по указанному _id не найден.');
       }
       res.send({ data: user });
     })
