@@ -6,15 +6,9 @@ const IncorrectDataError = require('../errors/incorrect-data-error');
 const CodeNotFoundError = require('../errors/code-not-found-error');
 const ConflictError = require('../errors/conflict-error');
 
-// const ERROR_CODE_INCORRECT_DATA = 400;
-// const ERROR_CODE_NOT_FOUND = 404;
-// const ERROR_CODE_DEFAULT = 500;
-
 module.exports.findAllUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    // .catch((err) => res.status(ERROR_CODE_DEFAULT)
-    // .send({ message: `На сервере произошла ошибка: ${err.message}` }));
     .catch(next);
 };
 
@@ -23,23 +17,15 @@ module.exports.findUserById = (req, res, next) => {
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Пользователь по указанному _id не найден.');
-        // res.status(ERROR_CODE_NOT_FOUND)
-        // .send({ message: 'Пользователь по указанному _id не найден.' });
-        // return;
       }
       res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new IncorrectDataError('Переданы некорректные данные.'));
-        // res.status(ERROR_CODE_INCORRECT_DATA)
-        // .send({ message: `Произошла ошибка: ${err.message}` });
-        // return;
       } else {
         next(err);
       }
-      // res.status(ERROR_CODE_DEFAULT)
-      // .send({ message: `На сервере произошла ошибкаqqqqqqq: ${err.message}` });
     });
 };
 
@@ -74,7 +60,6 @@ module.exports.createUser = (req, res, next) => {
         next(err);
       }
     });
-  // .catch(next);
 };
 
 module.exports.updateUser = (req, res, next) => {
@@ -114,8 +99,6 @@ module.exports.updateAvatar = (req, res, next) => {
 };
 
 module.exports.getUserInfo = (req, res, next) => {
-  console.log('qwerty');
-  console.log(req.user._id);
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
@@ -137,18 +120,12 @@ module.exports.login = (req, res, next) => {
     .then((user) => {
       if (!user) {
         throw new CodeNotFoundError('Неправильные почта или пароль.');
-        // return Promise.reject(new Error('Неправильные почта или пароль'));
-        // res.status(ERROR_CODE_NOT_FOUND).send({ message: 'Неправильные почта или пароль.' });
-        // return;
       }
       bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
             // хеши не совпали — отклоняем промис
             throw new CodeNotFoundError('Неправильные почта или пароль.');
-            // return Promise.reject(new Error('Неправильные почта или пароль'));
-            // res.status(ERROR_CODE_NOT_FOUND).send({ message: 'Неправильные почта или пароль.' });
-            // return;
           }
           // аутентификация успешна
           const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
