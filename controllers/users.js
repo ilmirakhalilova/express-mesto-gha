@@ -130,7 +130,7 @@ module.exports.login = (req, res, next) => {
           }
           // аутентификация успешна
           const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-          res.status(200).cookie('jwt', token, { httpOnly: true }).send({ name: user.name });
+          res.status(200).send({ token }); // .cookie('jwt', token, { httpOnly: true })
         })
         .catch(next);
     })
