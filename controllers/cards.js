@@ -32,7 +32,8 @@ module.exports.deleteCard = (req, res, next) => {
         throw new ForbiddenError('Доступ запрещен.');
       }
       Card.deleteOne(card)
-        .then(res.send({ data: card }));
+        .then(res.send({ data: card }))
+        .catch(next);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
